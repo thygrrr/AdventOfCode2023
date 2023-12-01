@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Unlicense
+
 import sys
 
 words = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]

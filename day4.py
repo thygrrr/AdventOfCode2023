@@ -1,27 +1,47 @@
 import sys
 
 
-def calc_score(win: str, num: str) -> int:
+def count_matches(win: str, num: str) -> int:
     winners = {int(w) for w in win.split(" ") if w}
     numbers = {int(n) for n in num.split(" ") if n}
     matches = numbers.intersection(winners)
+    return len(matches)
 
-    count = len(matches)
+
+def score_line(count: int) -> int:
     return 2 ** (count - 1) if count else 0
 
 
-def score_line(line: str) -> int:
+def match_line(line: str) -> int:
     card, numbers = line.split(": ")
     winners, scratches = numbers.split(" | ")
-    return calc_score(winners, scratches)
+    return count_matches(winners, scratches)
 
 
 def part_1(lines: list[str]):
-    scores = [score_line(l) for l in lines]
+    scores = [score_line(match_line(line)) for line in lines]
     print("Part 1", sum(scores))
+
+
+def part_2(lines: list[str]):
+    numbered = [[line] for line in lines]
+    completed = []
+    while numbered:
+        batch = numbered.pop(0)
+        completed.append(batch)
+        matches = match_line(batch[0])
+        for m in range(matches):
+            if m >= len(numbered):
+                continue
+            for c in range(len(batch)):
+                numbered[m].append(numbered[m][0])
+
+    cards = sum([len(batch) for batch in completed])
+    print("Part 2", cards)
 
 
 if __name__ == "__main__":
     with open(sys.argv[1]) as f:
         text = [line.strip() for line in f.readlines()]
         part_1(text)
+        part_2(text)

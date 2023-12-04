@@ -1,9 +1,10 @@
 import sys
+import re
 
 
 def count_matches(win: str, num: str) -> int:
-    winners = {int(w) for w in win.split(" ") if w}
-    numbers = {int(n) for n in num.split(" ") if n}
+    winners = {int(w) for w in re.findall(r"\d+", win)}
+    numbers = {int(n) for n in re.findall(r"\d+", num)}
     matches = numbers.intersection(winners)
     return len(matches)
 
@@ -30,11 +31,8 @@ def part_2(lines: list[str]):
         batch = numbered.pop(0)
         completed.append(batch)
         matches = match_line(batch[0])
-        for m in range(matches):
-            if m >= len(numbered):
-                continue
-            for c in range(len(batch)):
-                numbered[m].append(numbered[m][0])
+        for m in range(min(matches, len(numbered))):
+            numbered[m] += [numbered[m][0]] * len(batch)
 
     cards = sum([len(batch) for batch in completed])
     print("Part 2", cards)

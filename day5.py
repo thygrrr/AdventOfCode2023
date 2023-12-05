@@ -1,22 +1,25 @@
 import sys
 import re
+import itertools
 
 
 def parse_map(buffer: list[str]):
     header = buffer.pop(0)
+
     m = {}
-    ranges = []
     source, destination = (s.removesuffix(" map:") for s in header.split("-to-"))
     m["destination"] = destination
-    m["ranges"] = ranges
+    ranges = []
 
     while buffer:
         mapping = [int(x) for x in re.findall(r"\d+", buffer.pop(0))]
         if mapping:
+            mapping = [mapping[1], mapping[2], mapping[0]]  # bring into sensible order, start, length, destination
             ranges.append(mapping)
         else:
             break
 
+    m["ranges"] = sorted(ranges)  # this helps the iterative searcher a bit to decide if there are no more matches ahead
     return source, m
 
 
@@ -30,8 +33,8 @@ def build_maps(lines: list[str]):
 
 
 def remap(value: int, ranges: list[list[int]]) -> int:
-    for source, destination, length in ranges:
-        offset = value-source
+    for source, length, destination in ranges:
+        offset = value - source
         if 0 <= offset < length:
             value = destination + offset
             break
@@ -39,15 +42,59 @@ def remap(value: int, ranges: list[list[int]]) -> int:
 
 
 def resolve(value: int, step: str, maps: dict):
-    print("---")
-    print(step)
     while step in maps:
         m = maps[step]
         step = m["destination"]
         ranges = m["ranges"]
-        print(step)
         value = remap(value, ranges)
     return value
+
+
+def remap_range(workload: list[(int, int)], ranges: list[list[int]]) -> list[(int, int)]:
+    results = []
+    for start, span in workload:
+        for source, length, destination in ranges:
+            if start < source:  # skip to first occurrence
+                run = min(span, source - start, length)
+                results.append((start, run))
+                start += run
+                span -= run
+
+            if span == 0:
+                break
+
+            offset = start - source
+            run = min(span, length)
+            if 0 <= offset < run:
+                results.append((destination + offset, run))
+                start += run
+                span -= run
+
+            if span == 0:
+                break
+
+        if span > 0:
+            results.append((start, span))
+
+    return results
+
+
+def resolve_range(start: int, span: int, step: str, maps: dict):
+    workload = [(start, span)]
+
+    while step in maps:
+        m = maps[step]
+        step = m["destination"]
+        ranges = m["ranges"]
+        workload = remap_range(workload, ranges)
+
+    return min([s for s, _ in workload])
+
+
+def pairwise(iterable):  # Python 3.9 and earlier
+    a, b = itertools.tee(iterable)
+    next(b, None)
+    return zip(a, b)
 
 
 def part_1(seeds: list[int], lines: list[str]):
@@ -58,7 +105,9 @@ def part_1(seeds: list[int], lines: list[str]):
 
 
 def part_2(seeds: list[int], lines: list[str]):
-    pass
+    maps = build_maps(lines)
+    locations = [resolve_range(start, span, "seed", maps) for start, span in seeds]
+    print("Part 2", min(locations))
 
 
 if __name__ == "__main__":
@@ -67,4 +116,5 @@ if __name__ == "__main__":
         seed_data = [int(s) for s in re.findall(r"\d+", text.pop(0))]
         text.pop(0)  # consume empty line
         part_1(seed_data, text)
-        part_2(seed_data, text)
+        seed_ranges = pairwise(seed_data)
+        part_2(seed_ranges, text)

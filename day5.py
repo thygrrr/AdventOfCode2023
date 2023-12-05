@@ -1,6 +1,5 @@
 import sys
 import re
-import itertools
 
 
 def parse_map(buffer: list[str]):
@@ -54,24 +53,22 @@ def remap_range(workload: list[(int, int)], ranges: list[list[int]]) -> list[(in
     results = []
     for start, span in workload:
         for source, length, destination in ranges:
+            if span == 0:
+                break
+
             if start < source:  # skip to first occurrence
-                run = min(span, source - start, length)
+                run = min(span, source - start)
                 results.append((start, run))
                 start += run
                 span -= run
 
-            if span == 0:
-                break
-
             offset = start - source
-            run = min(span, length)
-            if 0 <= offset < run:
+            if 0 <= offset < length:
+                remaining = length - offset
+                run = min(span, remaining)
                 results.append((destination + offset, run))
                 start += run
                 span -= run
-
-            if span == 0:
-                break
 
         if span > 0:
             results.append((start, span))
@@ -91,10 +88,11 @@ def resolve_range(start: int, span: int, step: str, maps: dict):
     return min([s for s, _ in workload])
 
 
-def pairwise(iterable):  # Python 3.9 and earlier
-    a, b = itertools.tee(iterable)
-    next(b, None)
-    return zip(a, b)
+def actually_pairwise(iterable):
+    pairwise = []
+    for i in range(0, len(iterable), 2):
+        pairwise.append((iterable[i], iterable[i+1]))
+    return pairwise
 
 
 def part_1(seeds: list[int], lines: list[str]):
@@ -104,9 +102,18 @@ def part_1(seeds: list[int], lines: list[str]):
     print("Part 1", min(locations))
 
 
-def part_2(seeds: list[int], lines: list[str]):
+def part_2(seeds: list[(int, int)], lines: list[str]):
     maps = build_maps(lines)
     locations = [resolve_range(start, span, "seed", maps) for start, span in seeds]
+    print("Part 2", min(locations))
+
+
+def part_2_brute(seeds: list[(int, int)], lines: list[str]):
+    maps = build_maps(lines)
+    srs = [range(start, start+span) for start, span in seeds]
+    locations = []
+    for sr in srs:
+        locations += [resolve(seed, "seed", maps) for seed in sr]
     print("Part 2", min(locations))
 
 
@@ -116,5 +123,5 @@ if __name__ == "__main__":
         seed_data = [int(s) for s in re.findall(r"\d+", text.pop(0))]
         text.pop(0)  # consume empty line
         part_1(seed_data, text)
-        seed_ranges = pairwise(seed_data)
+        seed_ranges = actually_pairwise(seed_data)
         part_2(seed_ranges, text)

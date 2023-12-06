@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Unlicense
+
 import sys
 import re
 

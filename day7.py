@@ -7,7 +7,7 @@ card_ranks = "23456789TJQKA"
 card_ranks_wild = "J23456789TQKA"
 
 
-def hand_key(scored: (int, str)):
+def hand_key(scored: (int, str, int)):  # points value (better hand = higher), hand, bid (ignored)
     points, hand, _ = scored
     for card in hand:
         points *= 100
@@ -34,7 +34,7 @@ def score(hand: str) -> (int, int):
 def score_wild(hand: str) -> (int, int):
     counter = Counter(hand)
     jacks = counter['J']
-    del(counter['J'])
+    del counter['J']
 
     values = sorted([v for v in counter.values()], reverse=True)
 

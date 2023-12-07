@@ -25,8 +25,7 @@ def hand_key_wild(scored: (int, str)):
 
 def score(hand: str) -> (int, int):
     counter = Counter(hand)
-    values = counter.values()
-    squares = map(lambda x: x * x, values)
+    squares = [x * x for x in counter.values()]
     scored = sum(squares)
     return scored, hand
 
@@ -36,14 +35,11 @@ def score_wild(hand: str) -> (int, int):
     jacks = counter['J']
     del counter['J']
 
-    values = sorted(counter.values(), reverse=True)
+    # else [0] means ALL JACKS! So we need to recreate a group to add the no. of jacks to.
+    values = sorted(counter.values(), reverse=True) if len(counter) else [0]
+    values[0] += jacks  # Make the largest group larger by number of wildcards (jacks)
 
-    if not values:
-        values = [0]  # ALL JACKS! So we need to reserve a slot to add the count of jacks to.
-
-    values[0] += jacks  # Make the largest group larger by number of jacks
-
-    squares = map(lambda x: x * x, values)
+    squares = [x * x for x in values]
     scored = sum(squares)
     return scored, hand
 
@@ -68,7 +64,7 @@ def part_2(hands: list[(str, int)]):
 
 if __name__ == "__main__":
     with open(sys.argv[1]) as f:
-        text = [line.strip().split(" ") for line in f.readlines()]
+        text = [line.strip().split(" ") for line in f]
         hand_data = [(hand, int(bid)) for hand, bid in text]
         part_1(hand_data)
         part_2(hand_data)

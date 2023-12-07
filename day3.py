@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Unlicense
+
 import sys
 import re
 
@@ -105,7 +107,7 @@ def stars_for_numbers_alt(numbers: list[(int, (int, int, int))], stars: list[(in
         start, end, row = coordinates
         for position in stars:
             column, line = position
-            if (line-1 <= row <= line+1) and (start-1 <= column < end+1):  # this part is disgusting
+            if (line - 1 <= row <= line + 1) and (start - 1 <= column < end + 1):  # this part is disgusting
                 lookup.setdefault(position, []).append(number)
 
     return lookup

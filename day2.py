@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Unlicense
+
 import sys
 from functools import reduce
 import operator

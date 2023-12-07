@@ -25,7 +25,7 @@ def hand_key_wild(scored: (int, str)):
 
 def score(hand: str) -> (int, int):
     counter = Counter(hand)
-    values = [v for v in counter.values()]
+    values = counter.values()
     squares = map(lambda x: x * x, values)
     scored = sum(squares)
     return scored, hand
@@ -36,12 +36,12 @@ def score_wild(hand: str) -> (int, int):
     jacks = counter['J']
     del counter['J']
 
-    values = sorted([v for v in counter.values()], reverse=True)
+    values = sorted(counter.values(), reverse=True)
 
     if not values:
-        values = [5]  # FIVE OF A KIND JACKS
-    else:
-        values[0] += jacks  # Make the best group larger by number of jacks
+        values = [0]  # ALL JACKS! So we need to reserve a slot to add the count of jacks to.
+
+    values[0] += jacks  # Make the largest group larger by number of jacks
 
     squares = map(lambda x: x * x, values)
     scored = sum(squares)

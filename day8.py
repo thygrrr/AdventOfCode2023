@@ -1,7 +1,6 @@
-import sys
 import re
-import functools
-from sympy.ntheory import factorint as factors
+import sys
+import sympy
 
 
 def parse(line: str):
@@ -43,13 +42,8 @@ def count_steps(directions: str, maps: dict[str, (str, str)], start: str) -> int
 def part_2(directions: str, maps: dict[str, (str, str)]):
     locations = {loc for loc in filter(lambda d: d.endswith("A"), maps.keys())}
     steps = [count_steps(directions, maps, location) for location in locations]
-    primes = set()
-    for step in steps:
-        primes |= factors(step).keys()
-
-    multiples = functools.reduce(lambda x, y: x * y, primes)
-
-    print("Part 2:", multiples)
+    multiple = sympy.lcm(steps)
+    print("Part 2:", multiple)
 
 
 def part_1(directions: str, maps: dict[str, (str, str)]):

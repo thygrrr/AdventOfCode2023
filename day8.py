@@ -1,5 +1,5 @@
 import functools
-from sympy.ntheory import  factorint as factors
+from sympy.ntheory import factorint as factors
 
 import sys
 import re
@@ -49,7 +49,7 @@ def part_2(directions: str, maps: dict[str, (str, str)]):
     for step in steps:
         primes |= factors(step).keys()
 
-    multiples = functools.reduce(lambda x, y: x*y, primes)
+    multiples = functools.reduce(lambda x, y: x * y, primes)
 
     print("Part 2:", multiples)
 

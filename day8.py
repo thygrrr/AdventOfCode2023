@@ -1,9 +1,7 @@
-import functools
-from sympy.ntheory import factorint as factors
-
 import sys
 import re
-from collections import Counter
+import functools
+from sympy.ntheory import factorint as factors
 
 
 def parse(line: str):

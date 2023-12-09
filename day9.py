@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Unlicense
+
 import re
 import sys
 from itertools import pairwise

@@ -1,5 +1,6 @@
+# SPDX-License-Identifier: Unlicense
+
 import sys
-import re
 from collections import Counter
 
 card_ranks = "23456789TJQKA"

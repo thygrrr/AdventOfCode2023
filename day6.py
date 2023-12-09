@@ -6,9 +6,45 @@ import sys
 from functools import reduce
 
 
+def get_min_recursive(time: int, distance: int, width: float, start: float) -> int:
+    if width < 1:
+        if start * (time - start) > distance:
+            return math.ceil(start)
+        else:
+            return math.floor(start+1)
+
+    if start * (time - start) > distance:
+        mid = start - width / 4
+    else:
+        mid = start + width / 4
+
+    return get_min_recursive(time, distance, width / 2, mid)
+
+
+def get_max_recursive(time: int, distance: int, width: float, start: float) -> float:
+    if width < 1:
+        if start * (time - start) < distance:
+            return math.floor(start)
+        else:
+            return math.ceil(start-1)
+
+    if start * (time - start) < distance:
+        mid = start - width / 4
+    else:
+        mid = start + width / 4
+
+    return get_max_recursive(time, distance, width / 2, mid)
+
+
+def get_min_max_recursive(time: int, distance: int) -> (int, int):
+    a = get_min_recursive(time, distance, time, time / 2)
+    b = get_max_recursive(time, distance, time, time / 2)
+    return a, b
+
+
 def get_min_max(time: int, distance: int) -> (int, int):
-    x1 = time/2 - math.sqrt(time**2 - 4*distance)/2
-    x2 = time/2 + math.sqrt(time**2 - 4*distance)/2
+    x1 = time / 2 - math.sqrt(time ** 2 - 4 * distance) / 2
+    x2 = time / 2 + math.sqrt(time ** 2 - 4 * distance) / 2
     return math.ceil(x1), math.floor(x2)
 
 
